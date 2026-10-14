@@ -127,7 +127,7 @@ public class ChatControllerV2 {
     @PostMapping
     public String chat(@RequestBody ChatRequest chatRequest){
         return chatClient.prompt()
-                .user(chatRequest.prompt)
+                .user(chatRequest.prompt())
                 .call()
                 .content();
     }

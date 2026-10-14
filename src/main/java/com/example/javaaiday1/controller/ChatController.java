@@ -1,5 +1,8 @@
 package com.example.javaaiday1.controller;
 
+import org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor;
+import org.springframework.boot.origin.SystemEnvironmentOrigin;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 
@@ -12,8 +15,8 @@ public class ChatController {
 
     private final RestClient restClient = RestClient.create();
 
-    // 👇 替换成你注册的 API Key
-    private static final String API_KEY = "xxxx";
+    // 👇 从环境变量获取你注册的 API Key
+    private static final String API_KEY = System.getenv("ZHIPU_API_KEY");
 
     @PostMapping
     public String chat(@RequestBody Map<String, String> request) {
