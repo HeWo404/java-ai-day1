@@ -43,13 +43,18 @@ public class ChatControllerV2 {
                       @RequestHeader(value = "sessionId",defaultValue = "default")String sessionId) {
         //检索向量库
         List<Document> documentList = knowledgeBaseService.search(prompt);
+        // 代码层短路：context 为空就不调模型，防止自己乱答，100% 可控，还省一次 API 钱
+        if (documentList.isEmpty()) {
+            return "我不知道（知识库中没有相关信息）";
+        }
         //拼接向量库检索出来的片段
         String context = documentList.stream().map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
         //构造给大模型查找答案的文本
         String sysString = """
                 你是一个公司内部助手。请严格根据以下提供的上下文回答问题。
-                如果上下文中没有相关信息，直接回答“我不知道”，不要编造。
+                如果【上下文】为空，或其中没有与问题相关的信息，你必须只回答"我不知道"，
+                禁止使用你自己的知识回答。
                 【上下文】
                 {context}
                 """;

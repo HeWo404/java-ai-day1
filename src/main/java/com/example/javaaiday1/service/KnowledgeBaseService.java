@@ -86,7 +86,8 @@ public class KnowledgeBaseService {
         SearchRequest searchRequest = SearchRequest.builder()
                 .query(prompt)
                 .topK(3)    //最多召回几条 限制塞进 prompt 的 context 数量，每条都占 token，多了费钱还稀释重点。
-                .similarityThreshold(0.5)   //相似度及格线。余弦相似度范围 0~1，低于这条线的 chunk 直接丢弃。默认 0.0 等于“没有及格线”：哪怕用户问了一个语料里压根没有的问题，系统照样把“最像的 4 条”硬塞进 prompt。
+                //todo 0.3 为粗切分下的权宜值，切分细化+评测建好后重新标定
+                .similarityThreshold(0.3)   //相似度及格线。余弦相似度范围 0~1，低于这条线的 chunk 直接丢弃。默认 0.0 等于“没有及格线”：哪怕用户问了一个语料里压根没有的问题，系统照样把“最像的 4 条”硬塞进 prompt。
                 .build();
         List<Document> docs = vectorStore.similaritySearch(searchRequest);
         docs.forEach(d -> log.info("召回 score={} id={}", d.getScore(), d.getId()));
