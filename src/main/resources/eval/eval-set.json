@@ -1,0 +1,158 @@
+[
+  {
+    "question": "入职满3年有多少天年假？",
+    "goldSnippet": "满3年，年假10天",
+    "expectedAnswer": "10天",
+    "type": "direct"
+  },
+  {
+    "question": "工作三年能休几天假？",
+    "goldSnippet": "满3年，年假10天",
+    "expectedAnswer": "10天",
+    "type": "paraphrase"
+  },
+  {
+    "question": "请病假需要提供什么证明？",
+    "goldSnippet": "员工请病假需提供医院证明",
+    "expectedAnswer": "医院证明",
+    "type": "direct"
+  },
+  {
+    "question": "病假期间工资怎么发？",
+    "goldSnippet": "病假期间工资按基本工资的80%发放",
+    "expectedAnswer": "按基本工资的80%发放",
+    "type": "direct"
+  },
+  {
+    "question": "事假一年最多可以请多少天？",
+    "goldSnippet": "全年事假累计不得超过15天",
+    "expectedAnswer": "15天",
+    "type": "direct"
+  },
+  {
+    "question": "调休需要在多长时间内使用？",
+    "goldSnippet": "调休需在3个月内使用",
+    "expectedAnswer": "3个月内",
+    "type": "direct"
+  },
+  {
+    "question": "周末加班工资怎么算？",
+    "goldSnippet": "周末加班按2倍工资计算",
+    "expectedAnswer": "2倍工资",
+    "type": "direct"
+  },
+  {
+    "question": "单笔报销超过5000元需要谁审批？",
+    "goldSnippet": "单笔超过5000元的报销，需财务总监审批",
+    "expectedAnswer": "财务总监",
+    "type": "direct"
+  },
+  {
+    "question": "出差住宿一线城市每晚标准是多少？",
+    "goldSnippet": "一线城市每晚不超过500元",
+    "expectedAnswer": "500元",
+    "type": "direct"
+  },
+  {
+    "question": "每月迟到超过几次取消全勤奖？",
+    "goldSnippet": "每月迟到超过3次，取消当月全勤奖",
+    "expectedAnswer": "3次",
+    "type": "direct"
+  },
+  {
+    "question": "员工每月最多可以申请几天远程办公？",
+    "goldSnippet": "员工每月可申请最多5天远程办公",
+    "expectedAnswer": "5天",
+    "type": "direct"
+  },
+  {
+    "question": "公司为员工缴纳哪些社保？",
+    "goldSnippet": "公司为员工缴纳五险一金",
+    "expectedAnswer": "五险一金",
+    "type": "direct"
+  },
+  {
+    "question": "工资每月几号发放？",
+    "goldSnippet": "工资每月10日发放",
+    "expectedAnswer": "每月10日",
+    "type": "direct"
+  },
+  {
+    "question": "绩效奖金多久发一次？",
+    "goldSnippet": "绩效奖金每季度发放一次",
+    "expectedAnswer": "每季度一次",
+    "type": "direct"
+  },
+  {
+    "question": "年终奖什么时候发？",
+    "goldSnippet": "通常在春节前发放",
+    "expectedAnswer": "春节前",
+    "type": "direct"
+  },
+  {
+    "question": "外部培训费用超过多少需要签培训协议？",
+    "goldSnippet": "外部培训需签订培训协议，培训费用超过5000元需服务满2年",
+    "expectedAnswer": "5000元",
+    "type": "direct"
+  },
+  {
+    "question": "员工晋升每年几次？",
+    "goldSnippet": "员工晋升每年两次，分别在4月和10月",
+    "expectedAnswer": "两次",
+    "type": "direct"
+  },
+  {
+    "question": "试用期工资是转正工资的多少？",
+    "goldSnippet": "试用期工资为转正工资的80%",
+    "expectedAnswer": "80%",
+    "type": "direct"
+  },
+  {
+    "question": "离职需要提前多久申请？",
+    "goldSnippet": "员工离职需提前30天提交书面申请",
+    "expectedAnswer": "30天",
+    "type": "direct"
+  },
+  {
+    "question": "公司每年为员工提供几次免费体检？",
+    "goldSnippet": "公司每年为员工提供一次免费体检",
+    "expectedAnswer": "一次",
+    "type": "direct"
+  },
+  {
+    "question": "团建活动多久组织一次？",
+    "goldSnippet": "公司每季度组织一次团建活动",
+    "expectedAnswer": "每季度一次",
+    "type": "direct"
+  },
+  {
+    "question": "推荐候选人入职通过试用期后奖励多少钱？",
+    "goldSnippet": "推荐人可获得2000元奖励",
+    "expectedAnswer": "2000元",
+    "type": "direct"
+  },
+  {
+    "question": "员工反映问题后公司多久回复？",
+    "goldSnippet": "公司将在5个工作日内回复",
+    "expectedAnswer": "5个工作日",
+    "type": "direct"
+  },
+  {
+    "question": "请年假需要提前几天申请？",
+    "goldSnippet": "年假需提前3天在OA系统申请",
+    "expectedAnswer": "提前3天",
+    "type": "paraphrase"
+  },
+  {
+    "question": "公司有没有健身房？",
+    "goldSnippet": "",
+    "expectedAnswer": "我不知道",
+    "type": "irrelevant"
+  },
+  {
+    "question": "公司提供免费午餐吗？",
+    "goldSnippet": "",
+    "expectedAnswer": "我不知道",
+    "type": "irrelevant"
+  }
+]

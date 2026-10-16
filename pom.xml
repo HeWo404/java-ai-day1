@@ -66,6 +66,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!--OpenAI 依赖 -->
         <dependency>
             <groupId>org.springframework.ai</groupId>

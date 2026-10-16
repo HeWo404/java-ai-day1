@@ -42,7 +42,7 @@ public class ChatControllerV2 {
     public String rag(@RequestBody String prompt,
                       @RequestHeader(value = "sessionId",defaultValue = "default")String sessionId) {
         //检索向量库
-        List<Document> documentList = knowledgeBaseService.search(prompt);
+        List<Document> documentList = knowledgeBaseService.search(prompt,3);
         // 代码层短路：context 为空就不调模型，防止自己乱答，100% 可控，还省一次 API 钱
         if (documentList.isEmpty()) {
             return "我不知道（知识库中没有相关信息）";

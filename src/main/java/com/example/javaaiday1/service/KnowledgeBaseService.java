@@ -32,6 +32,7 @@ public class KnowledgeBaseService {
     private final SimpleVectorStore vectorStore;
     private final Resource knowledgeSoure;  //语言库url
     private final String storeDir;  //向量库缓存路径
+    private final int chunkSize = 400;
 
     //注入 spring AI 自动配置的EmBeddingModel 并初始化一个向量库
     public KnowledgeBaseService(EmbeddingModel emBeddingModel,
@@ -45,12 +46,13 @@ public class KnowledgeBaseService {
     @PostConstruct
     public void init() throws IOException, NoSuchAlgorithmException {
         //文件名
-        String cacheKey = sha256(knowledgeSoure.getInputStream().readAllBytes());
+        String cacheKey = sha256(knowledgeSoure.getInputStream().readAllBytes())+"-"+chunkSize;
         //生成文件目录
         Files.createDirectories(Path.of(storeDir));
         //生成文件
         File cacheFile = Path.of(storeDir, "vector-store-" + cacheKey + ".json").toFile();
         if(cacheFile.exists()){
+            //todo 修改文件时需要强制删除缓存文件
             //判断是否有缓存，有则用缓存的文件
             vectorStore.load(cacheFile);
             log.info("命中向量缓存 {}，跳过向量化", cacheFile.getName());
@@ -61,8 +63,12 @@ public class KnowledgeBaseService {
         List<Document> documents = textReader.read();
 
         //把文档进行切分成小片段
-        TokenTextSplitter splitter = new TokenTextSplitter();
-        List<Document> splitDocuments = splitter.apply(documents);
+//        TokenTextSplitter splitter = new TokenTextSplitter();
+        List<Document> splitDocuments = TokenTextSplitter.builder()
+                .withChunkSize(chunkSize)
+                .withMaxNumChunks(1000)
+                .build()
+                .apply(documents);
 
         //存入向量库
         vectorStore.add(splitDocuments);
@@ -82,15 +88,16 @@ public class KnowledgeBaseService {
     }
 
     //对外提供向量库检索的方法
-    public List<Document> search(String prompt) {
+    public List<Document> search(String prompt,int topK) {
         SearchRequest searchRequest = SearchRequest.builder()
                 .query(prompt)
-                .topK(3)    //最多召回几条 限制塞进 prompt 的 context 数量，每条都占 token，多了费钱还稀释重点。
+                .topK(topK)    //最多召回几条 限制塞进 prompt 的 context 数量，每条都占 token，多了费钱还稀释重点。
                 //todo 0.3 为粗切分下的权宜值，切分细化+评测建好后重新标定
                 .similarityThreshold(0.3)   //相似度及格线。余弦相似度范围 0~1，低于这条线的 chunk 直接丢弃。默认 0.0 等于“没有及格线”：哪怕用户问了一个语料里压根没有的问题，系统照样把“最像的 4 条”硬塞进 prompt。
                 .build();
+
         List<Document> docs = vectorStore.similaritySearch(searchRequest);
-        docs.forEach(d -> log.info("召回 score={} id={}", d.getScore(), d.getId()));
+//        docs.forEach(d -> log.info("召回 score={} id={}", d.getScore(), d.getId()));
         return docs;
     }
 
