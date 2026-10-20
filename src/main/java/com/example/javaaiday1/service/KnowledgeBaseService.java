@@ -1,5 +1,6 @@
 package com.example.javaaiday1.service;
 
+import com.example.javaaiday1.util.HybridRetriever;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,6 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
 
@@ -32,15 +33,18 @@ public class KnowledgeBaseService {
     private final SimpleVectorStore vectorStore;
     private final Resource knowledgeSoure;  //语言库url
     private final String storeDir;  //向量库缓存路径
-    private final int chunkSize = 400;
+    private final int chunkSize = 90;
+    private List<Document> allChunk = new ArrayList<Document>();
+    private final HybridRetriever hybridRetriever;
 
     //注入 spring AI 自动配置的EmBeddingModel 并初始化一个向量库
-    public KnowledgeBaseService(EmbeddingModel emBeddingModel,
+    public KnowledgeBaseService(EmbeddingModel emBeddingModel,HybridRetriever hybridRetriever,
                                 @Value("${app.knowledge.source}") Resource knowledgeSoure,
                                 @Value("${app.vector-store.dir}") String storeDir) {
         this.vectorStore = SimpleVectorStore.builder(emBeddingModel).build();
         this.knowledgeSoure = knowledgeSoure;
         this.storeDir = storeDir;
+        this.hybridRetriever =hybridRetriever;
     }
 
     @PostConstruct
@@ -55,6 +59,18 @@ public class KnowledgeBaseService {
             //todo 修改文件时需要强制删除缓存文件
             //判断是否有缓存，有则用缓存的文件
             vectorStore.load(cacheFile);
+            if(allChunk == null || allChunk.isEmpty()){
+                //读取文件内容
+                TextReader textReader = new TextReader(knowledgeSoure);
+                List<Document> documents = textReader.read();
+                List<Document> splitDocuments = TokenTextSplitter.builder()
+                        .withChunkSize(chunkSize)
+                        .withMaxNumChunks(1000)
+                        .build()
+                        .apply(documents);
+                //存入内存用于词法检索
+                this.allChunk = splitDocuments;
+            }
             log.info("命中向量缓存 {}，跳过向量化", cacheFile.getName());
             return;
         }
@@ -69,7 +85,8 @@ public class KnowledgeBaseService {
                 .withMaxNumChunks(1000)
                 .build()
                 .apply(documents);
-
+        //存入内存用于词法检索
+        this.allChunk = splitDocuments;
         //存入向量库
         vectorStore.add(splitDocuments);
         //把内容写进向量文件
@@ -87,7 +104,7 @@ public class KnowledgeBaseService {
         return HexFormat.of().formatHex(bytes).substring(0,12);
     }
 
-    //对外提供向量库检索的方法
+    //对外提供纯向量库检索的方法
     public List<Document> search(String prompt,int topK) {
         SearchRequest searchRequest = SearchRequest.builder()
                 .query(prompt)
@@ -99,6 +116,20 @@ public class KnowledgeBaseService {
         List<Document> docs = vectorStore.similaritySearch(searchRequest);
 //        docs.forEach(d -> log.info("召回 score={} id={}", d.getScore(), d.getId()));
         return docs;
+    }
+
+    //混合检索方法
+    public List<Document> hybridSearch(String query, int finalTopK) {
+        // 1. 先拿 Top-20 的向量结果作为候选池
+        SearchRequest request = SearchRequest.builder()
+                .query(query)
+                .topK(20)
+                .similarityThreshold(0.3)
+                .build();
+        List<Document> vectorResults = vectorStore.similaritySearch(request);
+
+        // 2. 丢给 HybridRetriever 进行 RRF 融合排序，返回最终的 Top-K
+        return hybridRetriever.hybridSearch(query, allChunk, vectorResults, finalTopK);
     }
 
     public VectorStore getVectorStore() {
